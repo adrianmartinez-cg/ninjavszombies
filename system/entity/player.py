@@ -38,7 +38,7 @@ class Player:
         self.running = False
         self.frame = 0
     
-    def move(self,solidRects):
+    def move(self,solidRects,display,scroll,kunai):
         self.movement = [0,0]
         if self.movingRight and not self.freeze:
             if self.running:
@@ -71,6 +71,7 @@ class Player:
             self.YMomentum = 0
         else:
             self.airTimer += 1
+        self.animate(display,scroll,kunai)
     
     def animate(self,display,scroll,kunai):
         if self.frame<=44:
@@ -124,7 +125,9 @@ class Player:
                             display.blit(self.jumpthrowAnimationFlip.imgList[self.frame//5],(self.rect.x-scroll[0],self.rect.y-scroll[1]))
                         else:
                             display.blit(self.jumpAnimationFlip.imgList[self.frame//5],(self.rect.x-scroll[0],self.rect.y-scroll[1]))
-        
+    def debug(self):
+        print(self.rect.x)
+        print(self.rect.y)
         
         
 if __name__ == "__main__":

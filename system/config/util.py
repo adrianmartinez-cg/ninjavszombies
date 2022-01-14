@@ -6,10 +6,16 @@ def renderBGFill(display,BGImg,color=(146,244,255),BGImgCoord = (0,0)):
     display.fill(color)
     display.blit(BGImg,BGImgCoord)
 
-def renderHud(font,lives,ammunition, color = (180,17,74)):
+def renderHudFont(font,lives,ammunition, display,hudHead,hudKunai,color = (180,17,74)):
     fontRenderLives=font.render(str(lives),True,color)
     fontRenderAmmunition=font.render(str(ammunition),True,color)
-    return fontRenderLives, fontRenderAmmunition
+    drawHud(display,hudHead,hudKunai,fontRenderLives,fontRenderAmmunition)
+
+def drawHud(display,hudHead,hudKunai,fontRenderLives,fontRenderAmmunition):
+    display.blit(hudHead,(0,0))
+    display.blit(fontRenderLives,(60,20))
+    display.blit(hudKunai,(0,50))
+    display.blit(fontRenderAmmunition,(60,70))
 
 def updateScroll(player,trueScroll,scroll):
     trueScroll[0] += ((player.rect.x-trueScroll[0])-200)/3

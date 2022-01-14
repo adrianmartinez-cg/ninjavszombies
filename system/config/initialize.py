@@ -8,6 +8,7 @@ from system.map.functions import loadMap
 from system.map.functions import loadTiles
 from system.map.functions import loadDangerTiles
 from system.map.functions import loadTileRects
+from system.entity.bank.enemies import EnemyRepository
 from pygame import mixer
 from pygame.locals import *
 
@@ -23,14 +24,22 @@ def pygameConfig():
     pygame.mixer.set_num_channels(64)
     return clock, WINDOW_SIZE , screen , display
 
-def loadMapConfig(player,mapselection,DANGER,COLLIDE_OFF,TILE_SIZE):
-    player.restart()
+def loadMapConfig(mapselection,DANGER,COLLIDE_OFF,TILE_SIZE,stabSound):
     gameover = False
     gamemap = loadMap('./maps/map'+mapselection)
     dangerTiles = loadDangerTiles(DANGER,gamemap)
     tileRects = loadTileRects(gamemap,COLLIDE_OFF,TILE_SIZE)
     maploaded = True
-    return gameover,gamemap, dangerTiles, tileRects , maploaded
+    enemyRepository = EnemyRepository()
+    kunai = Kunai(2000,2000,stabSound) 
+    if mapselection == '1':
+        player = Player(286,224)
+        enemyRepository.addZombies([[500,218]])
+    elif mapselection == '2':
+        player = Player(280,780)
+    player.restart()
+    solidRects = obtainSolidRects(tileRects,enemyRepository)
+    return player,kunai,enemyRepository,gameover,gamemap, dangerTiles, solidRects , tileRects, maploaded
 
 def loadTilesImg():
     tilesImg = loadTiles('sprites/tileset/Tiles/',19)
@@ -38,8 +47,7 @@ def loadTilesImg():
     return tilesImg, TILE_SIZE
 
 def initGameConfig():
-    player = Player(286,224)
-    kunai = Kunai(2000,2000) 
+    enemyRepository = EnemyRepository() 
     mapselection = '1'
     maploaded = False
     renderingDist = [8,14,5,8]     # left, right , bottom , top
@@ -48,7 +56,7 @@ def initGameConfig():
     DANGER=['H','J']
     ADDED_TILE_RECTS = False
     ADDED_ZOMBIES_RECTS=False 
-    return (player, kunai ,mapselection, maploaded, renderingDist,
+    return (mapselection, maploaded, renderingDist,
             tilesImgs, TILE_SIZE, COLLIDE_OFF, DANGER, ADDED_TILE_RECTS, ADDED_ZOMBIES_RECTS)
 
 def loadMiscImg():
@@ -89,3 +97,11 @@ def initSounds():
     throwSound=mixer.Sound('sounds/knifethrow.wav')
     stabSound=mixer.Sound('sounds/knifestab.wav')
     return (gameoverSound , throwSound , stabSound)
+
+def obtainSolidRects(tileRects,enemyRepository):
+    solidRects = []
+    for rect in tileRects:
+        solidRects.append(rect)
+    for zombie in enemyRepository.zombies:
+        solidRects.append(zombie.rect)
+    return solidRects
